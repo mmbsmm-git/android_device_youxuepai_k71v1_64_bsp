@@ -1,4 +1,14 @@
+# Android fstab file.
+#<src>                                  <mnt_point>         <type>  <mnt_flags and options>                         <fs_mgr_flags>
+# The filesystem that contains the filesystem checker binary (typically /system) cannot
+# specify MF_CHECK, 和 must come before any filesystems that specify MF_CHECK
+
+# OrangeFox 特定的挂载点
 /                         ext4     /dev/block/platform/bootdevice/by-name/system        flags=display=
+/system		                ext4		 /dev/block/bootdevice/by-name/system	                flags=backup=1;display=System
+/vendor		                ext4		 /dev/block/bootdevice/by-name/vendor	                flags=backup=1;display=Vendor
+/product	                ext4		 /dev/block/bootdevice/by-name/product	              flags=backup=1;display=Product
+/odm		                  ext4		 /dev/block/bootdevice/by-name/odm	                  flags=backup=1;display=ODM
 /vendor                   ext4     /dev/block/platform/bootdevice/by-name/vendor        flags=display=vendor
 /data                     ext4     /dev/block/platform/bootdevice/by-name/userdata      flags=display=data
 /cache                    ext4     /dev/block/platform/bootdevice/by-name/cache         flags=display=cache
@@ -40,3 +50,4 @@ auto                      vfat     /devices/platform/11200000.usb3_xhci*        
 /odmdtbo                  emmc     /dev/block/platform/bootdevice/by-name/odmdtbo       flags=display=odmdtbo
 /dtbo                     emmc     /dev/block/platform/bootdevice/by-name/dtbo          flags=display=dtbo
 /otp                      emmc     /dev/block/platform/bootdevice/by-name/otp           flags=display=otp
+/system_image	            emmc		 /dev/block/bootdevice/by-name/system	                flags=backup=0;flashimg=1
