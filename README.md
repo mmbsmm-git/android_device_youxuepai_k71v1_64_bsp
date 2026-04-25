@@ -1,0 +1,1 @@
+# mmbsmm-git-android_device_youxuepai_k71v1_64_bsp
