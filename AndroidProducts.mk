@@ -1,14 +1,6 @@
-#
-# Copyright (C) 2026 The Android Open Source Project
-# Copyright (C) 2026 SebaUbuntu's TWRP device tree generator
-#
-# SPDX-License-Identifier: Apache-2.0
-#
-
+# AndroidProducts.mk - YOUXUEPAI P709 (k71v1_64_bsp)
+# Multiple lunch products for compatibility with TWRP / OrangeFox / PBRP scripts
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/omni_k71v1_64_bsp.mk
-
-COMMON_LUNCH_CHOICES := \
-    omni_k71v1_64_bsp-user \
-    omni_k71v1_64_bsp-userdebug \
-    omni_k71v1_64_bsp-eng
+    $(LOCAL_DIR)/omni_k71v1_64_bsp.mk \
+    $(LOCAL_DIR)/twrp_k71v1_64_bsp.mk \
+    $(LOCAL_DIR)/ofox_k71v1_64_bsp.mk

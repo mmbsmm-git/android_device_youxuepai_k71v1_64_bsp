@@ -1,0 +1,13 @@
+# Build artifacts
+out/
+*.img
+# keep the prebuilt DTBO (required for recovery packaging)
+!prebuilt/recovery_dtbo.img
+*.zip
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/

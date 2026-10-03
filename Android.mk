@@ -1,12 +1,6 @@
-#
-# Copyright (C) 2026 The Android Open Source Project
-# Copyright (C) 2026 SebaUbuntu's TWRP device tree generator
-#
-# SPDX-License-Identifier: Apache-2.0
-#
-
+# Android.mk - YOUXUEPAI P709 (k71v1_64_bsp)
 LOCAL_PATH := $(call my-dir)
 
 ifeq ($(TARGET_DEVICE),k71v1_64_bsp)
-include $(call all-subdir-makefiles,$(LOCAL_PATH))
+include $(call all-subdir-makefiles)
 endif
