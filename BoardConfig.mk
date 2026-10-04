@@ -137,7 +137,10 @@ BOARD_ODMIMAGE_FILE_SYSTEM_TYPE := ext4
 OF_TARGET_DEVICE_ABI := arm64-v8a
 OF_AB_DEVICE_WITH_RECOVERY := false
 OF_DISABLE_MIUI_SPECIFIC_FEATURES := true
-OF_SUPPORT_ALL_BLOCK_OTA_UPDATES := 1
+# NOTE: OF_SUPPORT_ALL_BLOCK_OTA_UPDATES must NOT be combined with
+# OF_DISABLE_MIUI_SPECIFIC_FEATURES / OF_TWRP_COMPATIBILITY_MODE (OrangeFox
+# orangefox.mk checks this and aborts the build). This is not a MIUI device,
+# so we keep the MIUI-disable + TWRP-compat flags instead.
 OF_QUICK_BACKUP_LIST := "/boot;/system;/data;/vendor"
 OF_TWRP_COMPATIBILITY_MODE := 1
 OF_USE_MAGISKBOOT_FOR_ALL_PATCHES := 1
