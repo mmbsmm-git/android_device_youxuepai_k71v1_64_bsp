@@ -15,3 +15,6 @@ PRODUCT_MANUFACTURER := YOUXUEPAI
 
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.vendor.build.security_patch=2099-12-31
+
+# Fingerprint mimicking the stock userdebug build
+BUILD_FINGERPRINT := YOUXUEPAI/full_k71v1_64_bsp/k71v1_64_bsp:9/PPR1.180610.011/release08300021:userdebug/dev-keys

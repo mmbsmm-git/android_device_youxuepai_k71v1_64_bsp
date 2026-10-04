@@ -7,6 +7,9 @@ TARGET_OTA_ASSERT_DEVICE := k71v1_64_bsp
 
 DEVICE_PATH := device/youxuepai/k71v1_64_bsp
 
+# For building with a minimal manifest (recovery-only) — allow missing deps
+ALLOW_MISSING_DEPENDENCIES := true
+
 # Architecture
 TARGET_ARCH := arm64
 TARGET_ARCH_VARIANT := armv8-a
@@ -31,6 +34,9 @@ TARGET_NO_BOOTLOADER := true
 # Platform
 TARGET_BOARD_PLATFORM := mt6771
 TARGET_BOARD_PLATFORM_GPU := mali-g72
+
+# Screen density (panel 1200x2000, FHD-ish tablet)
+TARGET_SCREEN_DENSITY := 320
 
 # Kernel (prebuilt from stock boot.img, gzip zImage with embedded DTB; touch driver included)
 BOARD_KERNEL_CMDLINE := bootopt=64S3,32N2,64N2 androidboot.selinux=permissive buildvariant=userdebug
@@ -150,7 +156,9 @@ OF_FLASHLIGHT_ENABLE := 1
 OF_USE_TWRP_SAR_DETECT := 1
 OF_NO_TREBLE_COMPATIBILITY_CHECK := 1
 # OrangeFox maintainer (shown on the About page)
-OF_MAINTAINER := "梅梅不是没没"
+# Maintainer. NOTE: OrangeFox's build injects its own quotes around this value,
+# so do NOT wrap it in quotes here (would double-quote -> C++ literal-operator error).
+OF_MAINTAINER := 梅梅不是没没
 # Screen logical size (panel 1200x2000 portrait). UI scale hint for OFox.
 # Combined with ro.sf.hwrotation=0 (see device.mk) OF shows in portrait.
 OF_SCREEN_W := 1200
@@ -158,3 +166,8 @@ OF_SCREEN_H := 2000
 # Keymaster version for decryption (Android 9 ships keymaster 4.0).
 # Strongly recommended by OrangeFox to avoid getting stuck on the logo.
 OF_DEFAULT_KEYMASTER_VERSION := 4.0
+
+# Anti-rollback hack (build-time security patch level). Keeps the bootloader
+# from rejecting a recovery whose security patch is older than the stock build.
+PLATFORM_SECURITY_PATCH := 2099-12-31
+VENDOR_SECURITY_PATCH := 2099-12-31
