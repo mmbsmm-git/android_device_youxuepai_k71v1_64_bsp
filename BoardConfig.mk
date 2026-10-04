@@ -71,6 +71,13 @@ BOARD_HAS_LARGE_FILESYSTEM := true
 BOARD_SUPPRESS_SECURE_ERASE := true
 BOARD_HAS_NO_SELECT_BUTTON := true
 
+# System-as-root (SAR): system mounts at "/" (per stock recovery.fstab)
+BOARD_BUILD_SYSTEM_ROOT_IMAGE := true
+
+# Workaround for "error copying vendor files to recovery ramdisk" / "TARGET_COPY_OUT_VENDOR
+# must be set to 'vendor'" (same fix as OrangeFox fox_9.0 official begonia device)
+TARGET_COPY_OUT_VENDOR := vendor
+
 # Recovery
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/twrp.fstab
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
