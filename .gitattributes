@@ -1,0 +1,12 @@
+# Normalize line endings on checkout
+* text=auto
+
+# These MUST stay LF. CRLF breaks shell/rc parsing on the Linux build runner.
+*.mk      text eol=lf
+*.sh      text eol=lf
+*.rc      text eol=lf
+*.fstab   text eol=lf
+*.bp      text eol=lf
+README.md text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf

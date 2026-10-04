@@ -149,7 +149,7 @@ OF_DISABLE_MIUI_SPECIFIC_FEATURES := true
 # OF_DISABLE_MIUI_SPECIFIC_FEATURES / OF_TWRP_COMPATIBILITY_MODE (OrangeFox
 # orangefox.mk checks this and aborts the build). This is not a MIUI device,
 # so we keep the MIUI-disable + TWRP-compat flags instead.
-OF_QUICK_BACKUP_LIST := "/boot;/system;/data;/vendor"
+OF_QUICK_BACKUP_LIST := /boot;/system;/data;/vendor
 OF_TWRP_COMPATIBILITY_MODE := 1
 OF_USE_MAGISKBOOT_FOR_ALL_PATCHES := 1
 OF_FLASHLIGHT_ENABLE := 1
