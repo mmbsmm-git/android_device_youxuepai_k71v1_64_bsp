@@ -94,8 +94,10 @@ TW_CRYPTO_REAL_BLKDEV := "/dev/block/platform/bootdevice/by-name/userdata"
 TW_CRYPTO_MNT_POINT := "/data"
 TW_INCLUDE_CRYPTO_FBE := true
 
-# TWRP specific (landscape tablet)
-TW_THEME := landscape_hdpi
+# TWRP specific. NOTE: OrangeFox 9.0's GUI only ships portrait_hdpi and watch_mdpi
+# themes (no landscape_*). Begonia official uses portrait_hdpi. The panel is a
+# landscape tablet, so the UI may rotate / be small, but it compiles.
+TW_THEME := portrait_hdpi
 RECOVERY_SDCARD_ON_DATA := true
 TW_EXCLUDE_DEFAULT_USB_INIT := true
 TW_EXTRA_LANGUAGES := true
@@ -149,7 +151,9 @@ OF_USE_TWRP_SAR_DETECT := 1
 OF_NO_TREBLE_COMPATIBILITY_CHECK := 1
 # OrangeFox maintainer (shown on the About page)
 OF_MAINTAINER := "梅梅不是没没"
-# Screen logical height (device panel 1200x2000 portrait). UI scale hint for OFox.
+# Screen logical size (panel 1200x2000 portrait). UI scale hint for OFox.
+# Combined with ro.sf.hwrotation=0 (see device.mk) OF shows in portrait.
+OF_SCREEN_W := 1200
 OF_SCREEN_H := 2000
 # Keymaster version for decryption (Android 9 ships keymaster 4.0).
 # Strongly recommended by OrangeFox to avoid getting stuck on the logo.

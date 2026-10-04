@@ -7,6 +7,12 @@ PRODUCT_COPY_FILES += \
     device/youxuepai/k71v1_64_bsp/twrp.fstab:recovery/root/etc/twrp.fstab \
     device/youxuepai/k71v1_64_bsp/twrp.fstab:recovery/root/etc/recovery.fstab
 
+# Force default portrait orientation in recovery. The panel is physically
+# portrait (1200x2000); the stock system rotates it to landscape via
+# hwrotation=1. Setting 0 here makes OrangeFox show in portrait.
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.sf.hwrotation=0
+
 # TWRP device settings
 PRODUCT_PACKAGES += \
     twrp
