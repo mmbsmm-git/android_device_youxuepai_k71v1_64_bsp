@@ -7,6 +7,11 @@ PRODUCT_COPY_FILES += \
     device/youxuepai/k71v1_64_bsp/twrp.fstab:recovery/root/etc/twrp.fstab \
     device/youxuepai/k71v1_64_bsp/twrp.fstab:recovery/root/etc/recovery.fstab
 
+# Custom default font for OrangeFox GUI (JetBrainsMapleMono-Regular, contains CJK).
+# Overrides TWRP's default RobotoCondensed-Regular.ttf inside the recovery ramdisk's twres.
+PRODUCT_COPY_FILES += \
+    device/youxuepai/k71v1_64_bsp/recovery/root/twres/fonts/RobotoCondensed-Regular.ttf:recovery/root/twres/fonts/RobotoCondensed-Regular.ttf
+
 # Force default portrait orientation in recovery. The panel is physically
 # portrait (1200x2000); the stock system rotates it to landscape via
 # hwrotation=1. Setting 0 here makes OrangeFox show in portrait.
