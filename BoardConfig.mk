@@ -39,7 +39,9 @@ TARGET_BOARD_PLATFORM_GPU := mali-g72
 TARGET_SCREEN_DENSITY := 320
 
 # Kernel (prebuilt from stock boot.img, gzip zImage with embedded DTB; touch driver included)
-BOARD_KERNEL_CMDLINE := bootopt=64S3,32N2,64N2 androidboot.selinux=permissive buildvariant=userdebug
+# NOTE: do NOT put buildvariant= here — the build appends its own (lunch userdebug/eng),
+# and a duplicate buildvariant key in the cmdline is redundant/confusing.
+BOARD_KERNEL_CMDLINE := bootopt=64S3,32N2,64N2 androidboot.selinux=permissive
 BOARD_KERNEL_BASE := 0x40078000
 BOARD_KERNEL_OFFSET := 0x00008000
 BOARD_KERNEL_PAGESIZE := 2048
