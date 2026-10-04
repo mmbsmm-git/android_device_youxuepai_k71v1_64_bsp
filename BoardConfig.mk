@@ -41,7 +41,11 @@ TARGET_SCREEN_DENSITY := 320
 # Kernel (prebuilt from stock boot.img, gzip zImage with embedded DTB; touch driver included)
 # NOTE: do NOT put buildvariant= here — the build appends its own (lunch userdebug/eng),
 # and a duplicate buildvariant key in the cmdline is redundant/confusing.
-BOARD_KERNEL_CMDLINE := bootopt=64S3,32N2,64N2 androidboot.selinux=permissive
+# bootmode=recovery: the ramdisk built for this recovery currently also contains
+# a full system init.rc (build artifact of the recovery build), and the MTK lk does
+# not append androidboot.bootmode=recovery to the cmdline. Forcing it here makes
+# /init run init.recovery.rc (recovery) instead of init.rc (full system boot).
+BOARD_KERNEL_CMDLINE := bootopt=64S3,32N2,64N2 androidboot.selinux=permissive androidboot.bootmode=recovery
 BOARD_KERNEL_BASE := 0x40078000
 BOARD_KERNEL_OFFSET := 0x00008000
 BOARD_KERNEL_PAGESIZE := 2048
