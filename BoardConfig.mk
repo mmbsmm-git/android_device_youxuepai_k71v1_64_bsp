@@ -93,18 +93,16 @@ TARGET_COPY_OUT_VENDOR := vendor
 # Recovery
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/twrp.fstab
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
-TARGET_RECOVERY_DEVICE_MODULES += twrpdecrypt libtwrptar
 BOARD_HAS_NO_MISC_PARTITION := false
 BOARD_SUPPRESS_EMMC_WIPE := true
 BOARD_HAS_REMOVABLE_STORAGE := true
 BOARD_HAS_SDCARD_INTERNAL := true
 
-# Crypto
-TW_INCLUDE_CRYPTO := true
-TW_CRYPTO_FS_TYPE := "ext4"
-TW_CRYPTO_REAL_BLKDEV := "/dev/block/platform/bootdevice/by-name/userdata"
-TW_CRYPTO_MNT_POINT := "/data"
-TW_INCLUDE_CRYPTO_FBE := true
+# Crypto — DISABLED to shrink ramdisk. OFRP ramdisk is 21.6MB vs stock rec
+# 9.5MB; MTK lk cannot load the larger ramdisk (boot fails, falls back to system).
+# Temporarily cut crypto/decryption libs to get recovery booting; re-enable later.
+TW_INCLUDE_CRYPTO := false
+TW_INCLUDE_CRYPTO_FBE := false
 
 # TWRP specific. NOTE: OrangeFox 9.0's GUI only ships portrait_hdpi and watch_mdpi
 # themes (no landscape_*). Begonia official uses portrait_hdpi. The panel is a
@@ -113,16 +111,17 @@ TW_THEME := portrait_hdpi
 RECOVERY_SDCARD_ON_DATA := true
 TW_EXCLUDE_DEFAULT_USB_INIT := true
 TW_EXTRA_LANGUAGES := true
-TW_INCLUDE_NTFS_3G := true
-TW_INCLUDE_FUSE_EXFAT := true
-TW_INCLUDE_FB2PNG := true
-TW_INCLUDE_LIBRES := true
+# NTFS/exFAT/fb2png/libres/nano disabled to shrink ramdisk (lk ramdisk limit test)
+TW_INCLUDE_NTFS_3G := false
+TW_INCLUDE_FUSE_EXFAT := false
+TW_INCLUDE_FB2PNG := false
+TW_INCLUDE_LIBRES := false
 TW_USE_TOOLBOX := true
 TW_BRIGHTNESS_PATH := "/sys/class/leds/lcd-backlight/brightness"
 TW_MAX_BRIGHTNESS := 2047
 TW_DEFAULT_BRIGHTNESS := 900
 TW_EXCLUDE_TWRPAPP := true
-TW_INCLUDE_NANO := true
+TW_INCLUDE_NANO := false
 TW_DEVICE_VERSION := 1
 TW_HAS_EDL_MODE := true
 TW_IGNORE_MISC_WIPE_DATA := true
