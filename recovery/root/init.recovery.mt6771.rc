@@ -1,4 +1,4 @@
-﻿on init
+on init
     mkdir /config
     mount configfs none /config
     mkdir /config/usb_gadget/g1 0770 shell shell
@@ -37,7 +37,7 @@ on post-fs
     symlink /dev/block/mmcblk0boot1 /dev/block/platform/bootdevice/by-name/preloader_b
     mount ext4 /dev/block/by-name/cache /cache noatime nosuid nodev nomblk_io_submit barrier=1
 
-service console /system/bin/sh
+service console /sbin/busybox sh
     class core
     console
     disabled

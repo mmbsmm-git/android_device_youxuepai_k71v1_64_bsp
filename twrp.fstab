@@ -4,7 +4,6 @@
 
 
 
-
 /dev/block/platform/bootdevice/by-name/userdata /data ext4 noatime,nosuid,nodev,noauto_da_alloc,errors=panic wait,check,formattable,quota,resize,reservedsize=128m,encryptable=/dev/block/platform/bootdevice/by-name/metadata
 /dev/block/platform/bootdevice/by-name/metadata /metadata ext4 noatime,nosuid,nodev wait,check,formattable
 
@@ -14,9 +13,6 @@
 /dev/block/platform/bootdevice/by-name/protect2 /mnt/vendor/protect_s ext4 noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc wait,check,formattable
 /dev/block/platform/bootdevice/by-name/nvdata /mnt/vendor/nvdata ext4 noatime,nosuid,nodev,noauto_da_alloc,discard wait,check,formattable
 /dev/block/platform/bootdevice/by-name/nvcfg /mnt/vendor/nvcfg ext4 noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc wait,check,formattable
-
-
-
 
 
 /dev/block/platform/bootdevice/by-name/noah /mnt/vendor/noah ext4 noatime,nosuid,nodev,noauto_da_alloc,discard wait,check
@@ -51,8 +47,6 @@
 /dev/block/platform/bootdevice/by-name/sspm_2 /sspm_2 emmc defaults defaults
 
 
-
-
 /dev/block/platform/bootdevice/by-name/md1img /md1img emmc defaults defaults
 /dev/block/platform/bootdevice/by-name/md1dsp /md1dsp emmc defaults defaults
 
@@ -64,8 +58,6 @@
 /dev/block/platform/bootdevice/by-name/gz2 /gz2 emmc defaults defaults
 
 /dev/block/platform/bootdevice/by-name/spmfw /spmfw emmc defaults defaults
-
-
 
 
 /dev/block/platform/bootdevice/by-name/boot_para /boot_para emmc defaults defaults
