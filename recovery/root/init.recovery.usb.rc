@@ -1,0 +1,10 @@
+# init.recovery.usb.rc - intentionally EMPTY placeholder.
+#
+# OrangeFox/TWRP init.rc UNCONDITIONALLY imports /init.recovery.usb.rc even
+# when TW_EXCLUDE_DEFAULT_USB_INIT := true (which is what stops the build from
+# generating this file). A missing import target makes Android 9 init
+# LOG(FATAL) and crash -> lk reloads recovery -> bootloop.
+#
+# USB gadget/adb logic on this device is already handled by
+# init.recovery.mt6771.rc (configfs gadget). Keeping this file empty avoids
+# duplicate ffs.adb config and still satisfies the import.

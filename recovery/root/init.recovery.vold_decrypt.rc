@@ -1,0 +1,9 @@
+# init.recovery.vold_decrypt.rc - intentionally EMPTY placeholder.
+#
+# OrangeFox/TWRP init.rc UNCONDITIONALLY imports /init.recovery.vold_decrypt.rc
+# even when TW_INCLUDE_CRYPTO := false (which is what stops the build from
+# generating this file). A missing import target makes Android 9 init
+# LOG(FATAL) and crash -> lk reloads recovery -> bootloop.
+#
+# This device has crypto/decryption disabled (ramdisk size limit), so there is
+# nothing for this file to do; an empty file satisfies the import.
