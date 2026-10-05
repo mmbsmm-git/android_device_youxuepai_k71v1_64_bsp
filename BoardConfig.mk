@@ -50,7 +50,12 @@ BOARD_KERNEL_BASE := 0x40078000
 BOARD_KERNEL_OFFSET := 0x00008000
 BOARD_KERNEL_PAGESIZE := 2048
 BOARD_KERNEL_TAGS_OFFSET := 0x13F88000
-BOARD_RAMDISK_OFFSET := 0x14F88000
+# ramdisk_addr = BOARD_KERNEL_BASE + BOARD_RAMDISK_OFFSET = 0x58000000.
+# Raised from stock 0x55000000 to 0x58000000 so the OFRP ramdisk (compressed
+# ~20MB / decompressed ~47MB) does not overlap lk's 16MB ramdisk zone
+# (0x55000000-0x56000000); lk only warns when ramdisk_addr differs from its mb
+# macro, it does not hard-fail. Keep < DRAM top so decompression fits.
+BOARD_RAMDISK_OFFSET := 0x17F88000
 BOARD_KERNEL_IMAGE_NAME := Image.gz-dtb
 BOARD_BOOTIMG_HEADER_VERSION := 1
 TARGET_KERNEL_ARCH := arm64
