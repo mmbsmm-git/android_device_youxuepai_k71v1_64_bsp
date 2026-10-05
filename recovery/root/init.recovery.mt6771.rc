@@ -37,10 +37,13 @@ on post-fs
     symlink /dev/block/mmcblk0boot1 /dev/block/platform/bootdevice/by-name/preloader_b
     mount ext4 /dev/block/by-name/cache /cache noatime nosuid nodev nomblk_io_submit barrier=1
 
-service console /sbin/busybox sh
+service console /system/bin/sh
     class core
     console
     disabled
     #user shell
     #group shell log
     seclabel u:r:shell:s0
+
+service console /sbin/busybox sh
+    console

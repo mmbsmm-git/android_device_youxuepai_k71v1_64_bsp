@@ -7,7 +7,8 @@ PRODUCT_COPY_FILES += \
     device/youxuepai/k71v1_64_bsp/twrp.fstab:recovery/root/etc/twrp.fstab \
     device/youxuepai/k71v1_64_bsp/twrp.fstab:recovery/root/etc/recovery.fstab
 
-# Custom default font for OrangeFox GUI (JetBrainsMapleMono-Regular, contains CJK).
+# Custom default font for OrangeFox GUI (RobotoCondensed-Regular, verified to contain
+# CJK glyphs so the zh_CN UI renders; user wanted a CJK-capable font for the recovery).
 # Overrides TWRP's default RobotoCondensed-Regular.ttf inside the recovery ramdisk's twres.
 PRODUCT_COPY_FILES += \
     device/youxuepai/k71v1_64_bsp/recovery/root/twres/fonts/RobotoCondensed-Regular.ttf:recovery/root/twres/fonts/RobotoCondensed-Regular.ttf
