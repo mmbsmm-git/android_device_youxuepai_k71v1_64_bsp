@@ -27,7 +27,9 @@ BOARD_RAMDISK_OFFSET := 0x14f88000
 BOARD_TAGS_OFFSET := 0x13f88000
 BOARD_INCLUDE_RECOVERY_DTBO := true
 BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/prebuilt/recovery_dtbo.img
-TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/kernel
+# FIX: real kernel lives at kernel/kernel (touch-patched Himax), NOT prebuilt/kernel.
+# prebuilt/kernel did not exist -> build could not find the prebuilt kernel.
+TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/kernel/kernel
 
 # Kernel Command Line - 严格对齐原厂，去除非法参数
 BOARD_KERNEL_CMDLINE := bootopt=64S3,32N2,64N2
