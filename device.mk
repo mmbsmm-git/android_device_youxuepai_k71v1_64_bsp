@@ -7,6 +7,21 @@ PRODUCT_COPY_FILES += \
     device/youxuepai/k71v1_64_bsp/twrp.fstab:recovery/root/etc/twrp.fstab \
     device/youxuepai/k71v1_64_bsp/twrp.fstab:recovery/root/etc/recovery.fstab
 
+# CRITICAL: static prop.default for recovery.
+# Root cause: PRODUCT_PROPERTY_OVERRIDES only writes /system/build.prop, it NEVER
+# flows into recovery's ramdisk prop.default. So OFRP's prop.default was the OmniROM
+# default (eng/16.1.0/treble=false) - completely wrong for this device, causing the
+# boot loop. The fix (recommended by a reviewing AI) is to drop the STOCK prop.default
+# (11203B, from the factory recovery) into recovery/root/prop.default so the build
+# system overwrites it verbatim.
+# This copy is derived from the factory rec prop.default with ONLY two corrections:
+#   1) ro.sf.hwrotation=90 -> 0  (factory rec is landscape; user REQUIRES portrait)
+#   2) persist.sys.usb.config=none -> adb (recovery needs USB/ADB)
+# Everything else is the factory value: ro.build.type=user, release=9, treble=true,
+# abilist64=arm64-v8a, platform=mt6771, secure=1, full ro.noah.* set, OTA host, etc.
+PRODUCT_COPY_FILES += \
+    device/youxuepai/k71v1_64_bsp/recovery/root/prop.default:recovery/root/prop.default
+
 # Custom default font for OrangeFox GUI (RobotoCondensed-Regular, verified to contain
 # CJK glyphs so the zh_CN UI renders; user wanted a CJK-capable font for the recovery).
 # Overrides TWRP's default RobotoCondensed-Regular.ttf inside the recovery ramdisk's twres.
