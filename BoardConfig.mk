@@ -43,22 +43,11 @@ TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
 BOARD_BUILD_SYSTEM_ROOT_IMAGE := true
 
-# System Properties - 强制注入原厂关键属性
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.treble.enabled=true \
-    ro.build.version.release=9 \
-    ro.product.cpu.abilist64=arm64-v8a \
-    ro.product.cpu.abilist=arm64-v8a,armeabi-v7a,armeabi \
-    ro.product.cpu.abilist32=armeabi-v7a,armeabi \
-    ro.board.platform=mt6771 \
-    ro.mediatek.platform=MT6771 \
-    ro.sf.hwrotation=0 \
-    ro.product.device=k71v1_64_bsp \
-    ro.product.model=P709 \
-    ro.product.name=k71v1_64_bsp \
-    ro.product.brand=alps \
-    ro.product.manufacturer=alps \
-    ro.zygote=zygote64_32
+# NOTE: PRODUCT_PROPERTY_OVERRIDES was REMOVED from here (it is a product variable
+# and MUST NOT be assigned in BoardConfig.mk -> "readonly variable" build error).
+# Recovery properties are now injected correctly via the static file
+# recovery/root/prop.default (see device.mk PRODUCT_COPY_FILES), which is the only
+# path that reaches the recovery ramdisk. Do NOT re-add product vars here.
 
 # OrangeFox Configuration
 TW_THEME := portrait_hdpi
