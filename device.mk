@@ -7,18 +7,12 @@ PRODUCT_COPY_FILES += \
     device/youxuepai/k71v1_64_bsp/twrp.fstab:recovery/root/etc/twrp.fstab \
     device/youxuepai/k71v1_64_bsp/twrp.fstab:recovery/root/etc/recovery.fstab
 
-# CRITICAL: static prop.default for recovery.
-# Root cause: PRODUCT_PROPERTY_OVERRIDES only writes /system/build.prop, it NEVER
-# flows into recovery's ramdisk prop.default. So OFRP's prop.default was the OmniROM
-# default (eng/16.1.0/treble=false) - completely wrong for this device, causing the
-# boot loop. The fix (recommended by a reviewing AI) is to drop the STOCK prop.default
-# (11203B, from the factory recovery) into recovery/root/prop.default so the build
-# system overwrites it verbatim.
-# This copy is derived from the factory rec prop.default with ONLY two corrections:
-#   1) ro.sf.hwrotation=90 -> 0  (factory rec is landscape; user REQUIRES portrait)
-#   2) persist.sys.usb.config=none -> adb (recovery needs USB/ADB)
-# Everything else is the factory value: ro.build.type=user, release=9, treble=true,
-# abilist64=arm64-v8a, platform=mt6771, secure=1, full ro.noah.* set, OTA host, etc.
+# prop.default for recovery.
+# 2026-10-11 更正（实测）：本 OFRP 9.0 树里 PRODUCT_PROPERTY_OVERRIDES **确实**会进
+# recovery ramdisk 的 prop.default —— 证据：最终 ramdisk 的 prop.default(3415B) 里同时
+# 出现了 device.mk 的 ro.sf.hwrotation=0 与 omni_*.mk 的 ro.vendor.build.security_patch=2099-12-31。
+# 结论：之前的"静态 prop.default 覆盖"说法不成立（编译系统生成的 prop.default 会覆盖本条 copy），
+# 设备属性应走下方 PRODUCT_PROPERTY_OVERRIDES 开关块。静态文件保留仅作参考/兜底。
 PRODUCT_COPY_FILES += \
     device/youxuepai/k71v1_64_bsp/recovery/root/prop.default:recovery/root/prop.default
 
@@ -28,13 +22,19 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     device/youxuepai/k71v1_64_bsp/recovery/root/twres/fonts/RobotoCondensed-Regular.ttf:recovery/root/twres/fonts/RobotoCondensed-Regular.ttf
 
-# Display orientation in recovery. The panel is physically portrait (1200x2000),
-# so hwrotation=0 shows OrangeFox in portrait AND keeps touch coordinates aligned
-# (physical portrait touch + no rotation = consistent). User preference = portrait.
-# NOTE: slim_rec.py must NOT force hwrotation back to 90 (that was for the stock
-# landscape rec); keep 0 here so the build stays portrait.
+# 原厂对齐属性（原厂 rec 的 prop.default 里 treble=true / zygote64_32 / mount.fs=EXT4 /
+# platform=mt6771 / lcd_density=320 等；OFRP 默认生成的是 Omni 值：
+# treble=false、abilist64 空、完全缺 MTK 属性）。这些经 PRODUCT_PROPERTY_OVERRIDES
+# 注入，会落到 recovery ramdisk 的 prop.default（已实测）。
+# ro.sf.hwrotation=0：面板物理竖屏 1200x2000，竖屏显示 + 触摸坐标一致（用户要求竖屏）。
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.sf.hwrotation=0
+    ro.treble.enabled=true \
+    ro.zygote=zygote64_32 \
+    ro.mount.fs=EXT4 \
+    ro.mediatek.platform=MT6771 \
+    ro.sf.lcd_density=320 \
+    ro.sf.hwrotation=0 \
+    persist.sys.usb.config=adb
 
 # TWRP device settings
 PRODUCT_PACKAGES += \

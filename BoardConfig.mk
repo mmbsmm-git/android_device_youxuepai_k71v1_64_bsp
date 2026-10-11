@@ -29,6 +29,11 @@ BOARD_INCLUDE_RECOVERY_DTBO := true
 BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/prebuilt/recovery_dtbo.img
 # FIX: real kernel lives at kernel/kernel (touch-patched Himax), NOT prebuilt/kernel.
 # prebuilt/kernel did not exist -> build could not find the prebuilt kernel.
+# !!! 硬约束（2026-10-11 根因）: MTK lk 的 boot_linux_fdt() 从内核 blob 尾部反向扫描
+# FDT magic(d00dfeed) 取 DTB；找不到就 dtb_addr=0 解引用 -> 崩溃 -> 看门狗重启循环。
+# 所以 kernel/kernel 必须是 [gzip(Image) + 原厂 110572B DTB]，缺 DTB 必死循环。
+# 当前 kernel/kernel = 原厂补丁内核(gzip) + prebuilt/kernel_dtb(110572B)，共 9366062B。
+# 校验/重建见 Lazy 仓库 slim_rec.py（会 FATAL 报错防止再次丢 DTB）。
 TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/kernel/kernel
 
 # Kernel Command Line - 严格对齐原厂，去除非法参数
