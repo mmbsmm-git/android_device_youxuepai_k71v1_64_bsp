@@ -47,6 +47,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.mediatek.platform=MT6771 \
     ro.sf.lcd_density=320 \
     ro.sf.hwrotation=0 \
+    ro.adb.secure=0 \
     persist.sys.usb.config=adb
 
 # TWRP device settings
