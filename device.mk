@@ -22,6 +22,18 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     device/youxuepai/k71v1_64_bsp/recovery/root/twres/fonts/RobotoCondensed-Regular.ttf:recovery/root/twres/fonts/RobotoCondensed-Regular.ttf
 
+# CRITICAL: OrangeFox theme entry point.
+# The recovery binary loads /twres/ui.xml unconditionally (strings in sbin/recovery:
+# "/twres/ui.xml", "/twres/splash.xml", "/twres/languages/en.xml"). The 2026-10-11
+# build shipped a twres tree with NO ui.xml (also lost /ueventd.rc and the twres/twrp
+# dir; only splash.xml survived) -> the binary paints the splash, then the theme load
+# fails -> black screen / process exit -> init restarts the (non-oneshot)
+# "service recovery" -> splash <-> black loop with backlight on.
+# NOTE: 不要把 ui.xml/ueventd.rc 用 PRODUCT_COPY_FILES 拷进 recovery/root，避免与编译
+# 系统自己生成的目标同名冲突。改为由 Lazy 仓库 slim_rec.py 在打包阶段注入/校验
+# (源文件就放在本目录 recovery/root/twres/ui.xml 与 recovery/root/ueventd.rc)。
+# slim_rec.py 会在 twres/ui.xml 缺失时直接 FATAL，防止再产出会 loop 的镜像。
+
 # 原厂对齐属性（原厂 rec 的 prop.default 里 treble=true / zygote64_32 / mount.fs=EXT4 /
 # platform=mt6771 / lcd_density=320 等；OFRP 默认生成的是 Omni 值：
 # treble=false、abilist64 空、完全缺 MTK 属性）。这些经 PRODUCT_PROPERTY_OVERRIDES
