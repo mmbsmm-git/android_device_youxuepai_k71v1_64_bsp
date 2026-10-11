@@ -10,3 +10,11 @@
 README.md text eol=lf
 .gitignore text eol=lf
 .gitattributes text eol=lf
+# 行尾强制 LF（Linux 构建/解析），二进制绝不转换
+*.xml text eol=lf
+*.py  text eol=lf
+*.json text eol=lf
+*.ttf binary
+*.img binary
+*.bin binary
+kernel/kernel binary
