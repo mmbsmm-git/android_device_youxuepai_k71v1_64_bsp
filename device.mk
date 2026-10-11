@@ -16,11 +16,12 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     device/youxuepai/k71v1_64_bsp/recovery/root/prop.default:recovery/root/prop.default
 
-# Custom default font for OrangeFox GUI (RobotoCondensed-Regular, verified to contain
-# CJK glyphs so the zh_CN UI renders; user wanted a CJK-capable font for the recovery).
-# Overrides TWRP's default RobotoCondensed-Regular.ttf inside the recovery ramdisk's twres.
-PRODUCT_COPY_FILES += \
-    device/youxuepai/k71v1_64_bsp/recovery/root/twres/fonts/RobotoCondensed-Regular.ttf:recovery/root/twres/fonts/RobotoCondensed-Regular.ttf
+# 字体：使用 OrangeFox 主题自带字体（原厂字体），不做替换。
+# 2026-10-11 结论：曾用自定义 RobotoCondensed-Regular.ttf(2.58MB, JetBrains Maple Mono)
+# 覆盖默认字体，导致 slim_rec 为压体积把主题 font.xml 需要的字体
+# (Roboto-Regular/Medium、GoogleSans-*、EuclidFlex-* 等 15 个, 共约1.31MB) 全删了
+# -> 主题字体资源加载失败(NULL) -> 渲染 SIGSEGV -> init 反复重启(SIGSEGV 循环)。
+# 现改为不拷贝任何字体：编译产物自带完整的主题字体(约1.5MB)，slim_rec 不再删字体。
 
 # CRITICAL: OrangeFox theme entry point.
 # The recovery binary loads /twres/ui.xml unconditionally (strings in sbin/recovery:
