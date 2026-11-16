@@ -1,4 +1,4 @@
-﻿DEVICE_PATH := device/youxuepai/k71v1_64_bsp
+DEVICE_PATH := device/youxuepai/k71v1_64_bsp
 
 # Architecture
 TARGET_ARCH := arm64
@@ -70,3 +70,30 @@ TW_INCLUDE_CRYPTO := false
 TW_INCLUDE_LPDUMP := false
 TW_INCLUDE_RESETPROP := true
 TW_INCLUDE_REPACKTOOLS := true
+
+# ===== 内部存储 / fstab 生效相关（2026-11-17 补回）=====
+# 说明：这些变量在 BoardConfig.mk.bak 里原本就有，精简版被一起删掉了，
+# 直接导致 TWRP 不把 /data/media 当内部存储 —— 即使 fstab 路径修好，
+# Install 菜单仍可能找不到 /sdcard 里的 zip / img。
+
+RECOVERY_SDCARD_ON_DATA := true
+TW_INTERNAL_STORAGE_PATH := "/data/media"
+TW_INTERNAL_STORAGE_MOUNT_POINT := "data"
+TW_INCLUDE_CRYPTO_FBE := false
+BOARD_HAS_SDCARD_INTERNAL := true
+BOARD_SUPPRESS_EMMC_WIPE := true
+
+# 亮度（bak 里有，精简版丢了；不影响 fstab，但顺手补回）
+TW_BRIGHTNESS_PATH := "/sys/class/leds/lcd-backlight/brightness"
+TW_MAX_BRIGHTNESS := 2047
+TW_DEFAULT_BRIGHTNESS := 900
+
+# ⚠️ 不要加 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/twrp.fstab
+# device.mk 已经用 PRODUCT_COPY_FILES 把 twrp.fstab 拷成
+#   recovery/root/etc/twrp.fstab 和 recovery/root/etc/recovery.fstab
+# 再加 TARGET_RECOVERY_FSTAB 会和构建系统生成同一目标，报
+#   "Multiple build actions for .../etc/recovery.fstab" 重复拷贝错误。
+# 两份都已经在 ramdisk 里，TWRP 优先读 /etc/twrp.fstab，足够。
+#
+# 如果哪天改走 TARGET_RECOVERY_FSTAB 路线，记得把 device.mk 第 6-8 行
+# 那两条 PRODUCT_COPY_FILES 删掉，二选一。
