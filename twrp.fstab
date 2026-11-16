@@ -1,67 +1,88 @@
-# YOUXUEPAI U60 / P709 (k71v1_64_bsp) — TWRP fstab 修复版
+# YOUXUEPAI U60 / P709 (k71v1_64_bsp) — TWRP fstab 修正版 v2
+# 覆盖仓库根目录 twrp.fstab 和 recovery.fstab（两份内容相同）
 #
-# 三处根因（对照原文件）：
-#  1) 原 68 行全部写 /dev/block/platform/bootdevice/by-name/，但这台 MTK 在
-#     recovery 里实际存在的是 /dev/block/by-name/
-#     —— 证据：本仓库 init.recovery.mt6771.rc 第 48 行 mount cache 用的就是
-#        /dev/block/by-name/cache；用户 root shell 的 dd 也是这个路径。
-#     ueventd.rc 是高通通用模板（kgsl/msm_hw3d/oncrpc），没有 MTK 的 by-name
-#     规则，只在 init.rc 里手工建了 preloader_a/b 两个 bootdevice 链接。
-#     路径解析失败 -> 只有 TWRP 内建特殊处理的 boot/recovery 能出现在菜单。
-#  2) 原条目第 5 列全是 defaults，缺 TWRP 的 display / backup=1 / flashimg=1
-#     -> 即便路径对了，Mount / Backup / Install→Flash Image 也不会列这些分区。
-#  3) data 带 encryptable=.../metadata，但 BoardConfig 是 TW_INCLUDE_CRYPTO := false
-#     且本机 data 未加密 -> 去掉 encryptable，补 storage 让 /data/media 当内部存储。
+# ===== 为什么上一版刷了还是「只有两个」=====
+# 主因是 flag 格式写错了，不是分区路径：
+#   TWRP/OrangeFox 9.0 里，fstab 每行以 /dev/ 开头 => fstab_version = 2
+#   partition.cpp::Process_TW_Flags():
+#       char source_separator = ';';
+#       if (fstab_ver == 2) source_separator = ',';   ← v2 用【逗号】
+#   partition.cpp::Process_Fstab_Line():
+#       item_index > 3 时 strlcpy(twflags, ptr)        ← 第5列直接存，不带 flags= 前缀
+#   partitionmanager.cpp::Get_Partition_List("flashimg"):
+#       if ((*iter)->Can_Flash_Img && (*iter)->Is_Present)  ← 两个条件都要满足
 #
-# 格式：<src> <mount_point> <fstype> <mount_flags> <flags=...>
-# A-only 无 slot，不需要 slotselect。
+# 上一版写成 `flags=display="Boot";backup=1;flashimg=1;wipeingui`：
+#   - `flags=` 前缀让第一个 token 变成未知 flag
+#   - 分号在 v2 下不是分隔符，整串被当作 1 个 token
+#   => 命中 0 个 flag，Can_Flash_Img 全 false
+#   => Flash Image 列表只剩 UI 内建的 Boot / Recovery 两项
+# 本版：去掉 flags= 前缀、全改逗号分隔，实测 4 个 token 全部命中。
+#
+# ===== 还有第二道关：块设备路径 =====
+# 本版沿用 /dev/block/by-name/，依据是
+#   init.recovery.mt6771.rc 第48行 mount cache 用它、系统里 dd 也用它。
+# 但 recovery 的 ueventd.rc 是高通通用模板，未必建得出 by-name 链接。
+# 若改完 flag 菜单仍只有两个，在 TWRP 终端跑：
+#   ls -l /dev/block/by-name/ 2>&1 | head
+#   ls -l /dev/block/platform/bootdevice/by-name/ 2>&1 | head
+#   ls /dev/block/mmcblk0p* 2>/dev/null | head -40
+# 哪个目录存在就把本文件里的 /dev/block/by-name/ 整体替换成那个
+# （sed -i 's#/dev/block/by-name/#<真实路径>/#g' twrp.fstab），无需改别的。
+#
+# ===== 其他保持项 =====
+# - data 去掉 encryptable=.../metadata（BoardConfig TW_INCLUDE_CRYPTO := false
+#   且本机 data 未加密），补 storage 让 /data/media 当内部存储
+# - 27 个分区给 flashimg=1；frp/seccfg/sec1 只给 backup=1 防误刷
+# - A-only 无 slot，不需要 slotselect
+# - 格式：<block_device> <mount_point> <fstype> <mount_flags> <tw_flags>
 
 # ---------- 可挂载文件系统 ----------
-/dev/block/by-name/system      /                        ext4  ro                                                        flags=display="System";backup=1
-/dev/block/by-name/vendor      /vendor                  ext4  ro                                                        flags=display="Vendor";backup=1
-/dev/block/by-name/userdata    /data                    ext4  noatime,nosuid,nodev,noauto_da_alloc,errors=panic       flags=display="Data";backup=1;wipeingui;storage
-/dev/block/by-name/metadata    /metadata                ext4  noatime,nosuid,nodev                                     flags=backup=1;wipeingui
-/dev/block/by-name/cache       /cache                   ext4  noatime,nosuid,nodev,noauto_da_alloc,discard             flags=display="Cache";backup=1;wipeingui
+/dev/block/by-name/system              /                        ext4   ro                                                         display="System",backup=1
+/dev/block/by-name/vendor              /vendor                  ext4   ro                                                         display="Vendor",backup=1
+/dev/block/by-name/userdata            /data                    ext4   noatime,nosuid,nodev,noauto_da_alloc,errors=panic          display="Data",backup=1,wipeingui,storage
+/dev/block/by-name/metadata            /metadata                ext4   noatime,nosuid,nodev                                       backup=1,wipeingui
+/dev/block/by-name/cache               /cache                   ext4   noatime,nosuid,nodev,noauto_da_alloc,discard               display="Cache",backup=1,wipeingui
 
-/dev/block/by-name/protect1    /mnt/vendor/protect_f    ext4  noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc  flags=backup=1
-/dev/block/by-name/protect2    /mnt/vendor/protect_s    ext4  noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc  flags=backup=1
-/dev/block/by-name/nvdata      /mnt/vendor/nvdata       ext4  noatime,nosuid,nodev,noauto_da_alloc,discard             flags=backup=1
-/dev/block/by-name/nvcfg       /mnt/vendor/nvcfg        ext4  noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc  flags=backup=1
-/dev/block/by-name/noah        /mnt/vendor/noah         ext4  noatime,nosuid,nodev,noauto_da_alloc,discard             flags=backup=1
+/dev/block/by-name/protect1            /mnt/vendor/protect_f    ext4   noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc   backup=1
+/dev/block/by-name/protect2            /mnt/vendor/protect_s    ext4   noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc   backup=1
+/dev/block/by-name/nvdata              /mnt/vendor/nvdata       ext4   noatime,nosuid,nodev,noauto_da_alloc,discard               backup=1
+/dev/block/by-name/nvcfg               /mnt/vendor/nvcfg        ext4   noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc   backup=1
+/dev/block/by-name/noah                /mnt/vendor/noah         ext4   noatime,nosuid,nodev,noauto_da_alloc,discard               backup=1
 
 # ---------- 可安全卡刷的裸分区（Install → Flash Image 会出现）----------
-/dev/block/by-name/boot        /boot                     emmc  defaults  flags=display="Boot";backup=1;flashimg=1;wipeingui
-/dev/block/by-name/recovery    /recovery                 emmc  defaults  flags=display="Recovery";backup=1;flashimg=1;wipeingui
-/dev/block/by-name/dtbo        /dtbo                     emmc  defaults  flags=display="Dtbo";backup=1;flashimg=1
-/dev/block/by-name/lk          /bootloader               emmc  defaults  flags=display="LK";backup=1;flashimg=1
-/dev/block/by-name/lk2         /bootloader2              emmc  defaults  flags=display="LK2";backup=1;flashimg=1
-/dev/block/by-name/logo        /logo                     emmc  defaults  flags=display="Logo";backup=1;flashimg=1
-/dev/block/by-name/tee1        /tee1                     emmc  defaults  flags=display="TEE1";backup=1;flashimg=1
-/dev/block/by-name/tee2        /tee2                     emmc  defaults  flags=display="TEE2";backup=1;flashimg=1
-/dev/block/by-name/gz1         /gz1                      emmc  defaults  flags=display="GZ1";backup=1;flashimg=1
-/dev/block/by-name/gz2         /gz2                      emmc  defaults  flags=display="GZ2";backup=1;flashimg=1
-/dev/block/by-name/scp1        /scp1                     emmc  defaults  flags=display="SCP1";backup=1;flashimg=1
-/dev/block/by-name/scp2        /scp2                     emmc  defaults  flags=display="SCP2";backup=1;flashimg=1
-/dev/block/by-name/sspm_1      /sspm_1                   emmc  defaults  flags=display="SSPM1";backup=1;flashimg=1
-/dev/block/by-name/sspm_2      /sspm_2                   emmc  defaults  flags=display="SSPM2";backup=1;flashimg=1
-/dev/block/by-name/md1img      /md1img                   emmc  defaults  flags=display="Modem";backup=1;flashimg=1
-/dev/block/by-name/md1dsp      /md1dsp                   emmc  defaults  flags=display="ModemDSP";backup=1;flashimg=1
-/dev/block/by-name/cam_vpu1    /cam_vpu1                 emmc  defaults  flags=display="CamVPU1";backup=1;flashimg=1
-/dev/block/by-name/cam_vpu2    /cam_vpu2                 emmc  defaults  flags=display="CamVPU2";backup=1;flashimg=1
-/dev/block/by-name/cam_vpu3    /cam_vpu3                 emmc  defaults  flags=display="CamVPU3";backup=1;flashimg=1
-/dev/block/by-name/spmfw       /spmfw                    emmc  defaults  flags=display="SPMFW";backup=1;flashimg=1
-/dev/block/by-name/expdb       /expdb                    emmc  defaults  flags=display="EXPDB";backup=1;flashimg=1
-/dev/block/by-name/boot_para   /boot_para                emmc  defaults  flags=display="BootPara";backup=1;flashimg=1
-/dev/block/by-name/para        /misc                     emmc  defaults  flags=display="Para";backup=1;flashimg=1
-/dev/block/by-name/proinfo     /proinfo                  emmc  defaults  flags=display="ProInfo";backup=1;flashimg=1
-/dev/block/by-name/nvram       /nvram                    emmc  defaults  flags=display="NVRAM";backup=1;flashimg=1
-/dev/block/by-name/otp         /otp                      emmc  defaults  flags=display="OTP";backup=1;flashimg=1
-/dev/block/by-name/flashinfo   /flashinfo                emmc  defaults  flags=display="FlashInfo";backup=1;flashimg=1
+/dev/block/by-name/boot                /boot                    emmc   defaults                                                   display="Boot",backup=1,flashimg=1,wipeingui
+/dev/block/by-name/recovery            /recovery                emmc   defaults                                                   display="Recovery",backup=1,flashimg=1,wipeingui
+/dev/block/by-name/dtbo                /dtbo                    emmc   defaults                                                   display="Dtbo",backup=1,flashimg=1
+/dev/block/by-name/lk                  /bootloader              emmc   defaults                                                   display="LK",backup=1,flashimg=1
+/dev/block/by-name/lk2                 /bootloader2             emmc   defaults                                                   display="LK2",backup=1,flashimg=1
+/dev/block/by-name/logo                /logo                    emmc   defaults                                                   display="Logo",backup=1,flashimg=1
+/dev/block/by-name/tee1                /tee1                    emmc   defaults                                                   display="TEE1",backup=1,flashimg=1
+/dev/block/by-name/tee2                /tee2                    emmc   defaults                                                   display="TEE2",backup=1,flashimg=1
+/dev/block/by-name/gz1                 /gz1                     emmc   defaults                                                   display="GZ1",backup=1,flashimg=1
+/dev/block/by-name/gz2                 /gz2                     emmc   defaults                                                   display="GZ2",backup=1,flashimg=1
+/dev/block/by-name/scp1                /scp1                    emmc   defaults                                                   display="SCP1",backup=1,flashimg=1
+/dev/block/by-name/scp2                /scp2                    emmc   defaults                                                   display="SCP2",backup=1,flashimg=1
+/dev/block/by-name/sspm_1              /sspm_1                  emmc   defaults                                                   display="SSPM1",backup=1,flashimg=1
+/dev/block/by-name/sspm_2              /sspm_2                  emmc   defaults                                                   display="SSPM2",backup=1,flashimg=1
+/dev/block/by-name/md1img              /md1img                  emmc   defaults                                                   display="Modem",backup=1,flashimg=1
+/dev/block/by-name/md1dsp              /md1dsp                  emmc   defaults                                                   display="ModemDSP",backup=1,flashimg=1
+/dev/block/by-name/cam_vpu1            /cam_vpu1                emmc   defaults                                                   display="CamVPU1",backup=1,flashimg=1
+/dev/block/by-name/cam_vpu2            /cam_vpu2                emmc   defaults                                                   display="CamVPU2",backup=1,flashimg=1
+/dev/block/by-name/cam_vpu3            /cam_vpu3                emmc   defaults                                                   display="CamVPU3",backup=1,flashimg=1
+/dev/block/by-name/spmfw               /spmfw                   emmc   defaults                                                   display="SPMFW",backup=1,flashimg=1
+/dev/block/by-name/expdb               /expdb                   emmc   defaults                                                   display="EXPDB",backup=1,flashimg=1
+/dev/block/by-name/boot_para           /boot_para               emmc   defaults                                                   display="BootPara",backup=1,flashimg=1
+/dev/block/by-name/para                /misc                    emmc   defaults                                                   display="Para",backup=1,flashimg=1
+/dev/block/by-name/proinfo             /proinfo                 emmc   defaults                                                   display="ProInfo",backup=1,flashimg=1
+/dev/block/by-name/nvram               /nvram                   emmc   defaults                                                   display="NVRAM",backup=1,flashimg=1
+/dev/block/by-name/otp                 /otp                     emmc   defaults                                                   display="OTP",backup=1,flashimg=1
+/dev/block/by-name/flashinfo           /flashinfo               emmc   defaults                                                   display="FlashInfo",backup=1,flashimg=1
 
 # ---------- 只备份、不给 Flash Image（误刷会丢校准/密钥，别手滑）----------
-/dev/block/by-name/frp         /persistent               emmc  defaults  flags=backup=1
-/dev/block/by-name/seccfg      /seccfg                   emmc  defaults  flags=backup=1
-/dev/block/by-name/sec1        /sec1                     emmc  defaults  flags=backup=1
+/dev/block/by-name/frp                 /persistent              emmc   defaults                                                   backup=1
+/dev/block/by-name/seccfg              /seccfg                  emmc   defaults                                                   backup=1
+/dev/block/by-name/sec1                /sec1                    emmc   defaults                                                   backup=1
 
 # ---------- 外置存储（按需启用）----------
 # 原文件这两行格式是错的：第二列写成 auto 当挂载点、还带 encryptable=userdata，
